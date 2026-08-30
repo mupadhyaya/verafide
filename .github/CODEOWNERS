@@ -1,0 +1,17 @@
+# These paths require human (founder) review before merge, even when CI is green.
+# See CLAUDE.md invariants and .claude/skills/daily-backlog-work/SKILL.md's escalate matrix.
+
+/supabase/migrations/                          @mupadhyaya
+/supabase/functions/verification-webhook/      @mupadhyaya
+/supabase/functions/moderation-webhook/        @mupadhyaya
+/packages/validation/src/verification/         @mupadhyaya
+/packages/shared-types/src/verification.ts     @mupadhyaya
+/packages/shared-types/src/monetization.ts     @mupadhyaya
+**/billing/**                                  @mupadhyaya
+**/payments/**                                 @mupadhyaya
+/infra/                                        @mupadhyaya
+.github/workflows/                             @mupadhyaya
+.github/CODEOWNERS                             @mupadhyaya
+CLAUDE.md                                      @mupadhyaya
+.claude/                                       @mupadhyaya
+eas.json                                       @mupadhyaya

@@ -1,0 +1,3 @@
+-- Local dev seed data. Kept minimal on purpose — the PostGIS performance
+-- spike (Phase 0, see docs/BACKLOG.md) uses its own larger synthetic seed
+-- script, not this file, so `supabase db reset` stays fast for everyday dev.
