@@ -1,5 +1,14 @@
 # Branch protection setup for `main`
 
+**Status: not yet applied.** GitHub's branch protection API (required status checks + required
+CODEOWNERS review) requires either a public repo or a GitHub Pro plan on a private repo — this
+repo is private and on the free plan, and neither "make the source public" nor "pay for Pro" is a
+decision to make unilaterally (see the hosting/spend preference in project memory). Enforcement
+today is convention-only: `.github/CODEOWNERS` exists and `.claude/skills/daily-backlog-work/
+SKILL.md`'s escalate matrix references it, but nothing server-side blocks a direct push or an
+unreviewed merge yet. Low risk while solo (only the founder has push access), but revisit before
+adding any other contributor. Re-attempt the command below once the repo goes public or gets Pro.
+
 Applied once via `gh api` (or GitHub UI → Settings → Branches) after the first push, since the
 branch and its check names need to exist first. Re-apply if the repo is ever recreated.
 
