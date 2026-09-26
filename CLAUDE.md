@@ -5,10 +5,13 @@
 Verafide is a verified, discreet, adult dating app (iOS, Android, web) open to all relationship
 statuses, combining Tinder's swipe/match mechanic with Gleeden-style discretion features. It
 exists to directly counter the two most-cited 2026 dating-app complaints: fake/bot profiles and
-aggressive paywalls. Two invariants make that a mechanism, not marketing copy — see below.
+aggressive paywalls — plus a privacy-first architecture where verification happens on-device and
+the server can never read a user's photos. Four invariants make that a mechanism, not marketing
+copy — see below.
 
 Full product/business plan: `/Users/mohit.upadhyaya/.claude/plans/explore-the-various-dating-cozy-boole.md`.
-For the day-to-day task-picking procedure and autonomy boundaries, see
+Architecture diagram: `docs/diagrams/architecture.drawio` (open in app.diagrams.net or the draw.io
+desktop app). For the day-to-day task-picking procedure and autonomy boundaries, see
 `.claude/skills/daily-backlog-work/SKILL.md`.
 
 ## Tech stack
@@ -33,6 +36,8 @@ For the day-to-day task-picking procedure and autonomy boundaries, see
   the `MONETIZABLE_FEATURES` allowlist). No runtime logic.
 - `packages/api-client` — the only place allowed to talk to Supabase directly. Owns the
   client-side cache layer (mobile: `expo-sqlite`/MMKV, web: `IndexedDB`) and pagination helpers.
+  `packages/api-client/src/crypto/` (added Phase 1) owns photo encryption/decryption and key
+  wrapping — a CODEOWNERS-protected path (see Invariants 3 & 4 below).
 - `packages/validation` — zod schemas. Single source of truth for input validation; do not
   duplicate validation logic inline in an app.
 - `packages/config` — shared `tsconfig.base.json`, `eslint.base.mjs`, `prettier.base.mjs`.
@@ -63,6 +68,15 @@ For the day-to-day task-picking procedure and autonomy boundaries, see
 5. **Lightweight-by-default.** New screens/queries use the client-side cache layer and pagination
    helpers in `packages/api-client` rather than re-fetching full datasets. This keeps hosting
    costs low regardless of which Phase 5 hosting option (see ADR-0003) is eventually chosen.
+6. **Invariant 3 — no plaintext at rest.** No photo is ever persisted server-side in readable
+   form. The server may hold plaintext only transiently, in memory, during the upload-time
+   moderation scan (bounded to milliseconds, never written to disk or logs) before discarding it
+   — everything in storage is ciphertext produced by `packages/api-client/src/crypto/`. See the
+   plan's "Privacy-First Media & Verification Architecture" section for the full design.
+7. **Invariant 4 — server-enforced access policy.** A photo's album-privacy (`public`/`private`)
+   and view-duration policy (unlimited/once/N-second) is enforced via server-side key-grant
+   expiry, not client-only logic — a modified client must not be able to bypass it. Any PR
+   touching the crypto module or key-grant expiry logic requires CODEOWNERS review.
 
 ## Coding conventions
 
@@ -97,7 +111,7 @@ supabase test db  # pgTAP invariant tests, once supabase/tests/ exists
 - [ ] Linked issue addressed, PR description includes `Closes #<issue>`
 - [ ] Tests added/updated for the change
 - [ ] `pnpm lint && pnpm typecheck && pnpm test` green locally
-- [ ] Invariant tests (`rls_verification_gate.sql`, `rls_block_report.sql` once it exists)
-      untouched, or updated and passing
+- [ ] Invariant tests (`rls_verification_gate.sql`, `rls_block_report.sql`,
+      encrypted-media round-trip test — once each exists) untouched, or updated and passing
 - [ ] Docs updated if a new table/RPC/ADR-worthy decision was introduced
 - [ ] No secrets committed

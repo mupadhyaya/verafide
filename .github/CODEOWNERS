@@ -7,6 +7,7 @@
 /packages/validation/src/verification/         @mupadhyaya
 /packages/shared-types/src/verification.ts     @mupadhyaya
 /packages/shared-types/src/monetization.ts     @mupadhyaya
+/packages/api-client/src/crypto/               @mupadhyaya
 **/billing/**                                  @mupadhyaya
 **/payments/**                                 @mupadhyaya
 /infra/                                        @mupadhyaya
