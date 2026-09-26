@@ -2,12 +2,17 @@
 
 ## Mission
 
-Verafide is a verified, discreet, adult dating app (iOS, Android, web) open to all relationship
-statuses, combining Tinder's swipe/match mechanic with Gleeden-style discretion features. It
-exists to directly counter the two most-cited 2026 dating-app complaints: fake/bot profiles and
-aggressive paywalls — plus a privacy-first architecture where verification happens on-device and
-the server can never read a user's photos. Four invariants make that a mechanism, not marketing
-copy — see below.
+Verafide is a verified, discreet, adult dating app (web, then iOS, then Android) open to all
+relationship statuses, combining Tinder's swipe/match mechanic with Gleeden-style discretion
+features. It exists to directly counter the two most-cited 2026 dating-app complaints: fake/bot
+profiles and aggressive paywalls — plus a privacy-first architecture where the server can never
+read a user's photos, even though verification itself runs through a cloud vendor (Didit) rather
+than fully on-device (see Rollout note below). Four invariants make that a mechanism, not
+marketing copy — see below.
+
+**Rollout order:** ship **web first** (Phases 1-5), then port the same backend/packages to iOS
+(Phase 6) and Android (Phase 7) — not all three platforms together. `apps/mobile` work is paused
+until Phase 6; don't pick up mobile-specific issues before then unless explicitly asked.
 
 Full product/business plan: `/Users/mohit.upadhyaya/.claude/plans/explore-the-various-dating-cozy-boole.md`.
 Architecture diagram: `docs/diagrams/architecture.drawio` (open in app.diagrams.net or the draw.io
@@ -24,7 +29,7 @@ desktop app). For the day-to-day task-picking procedure and autonomy boundaries,
 | Backend | Postgres + PostGIS via Supabase (Auth, Storage, Edge Functions, Realtime) |
 | Mobile CI/CD | EAS Build + EAS Submit |
 | Web hosting | Vercel |
-| Hosting target | Deferred to Phase 5 — see `docs/DECISIONS/ADR-0003-hosting.md` once written |
+| Hosting target | Vercel + Supabase free tier for Phase 4 beta (needed then, not deferred further); ResellerClub-vs-Supabase-Pro decided only once free-tier limits are hit — see `docs/DECISIONS/ADR-0003-hosting.md` once written |
 
 ## Repo map
 
@@ -43,7 +48,8 @@ desktop app). For the day-to-day task-picking procedure and autonomy boundaries,
 - `packages/config` — shared `tsconfig.base.json`, `eslint.base.mjs`, `prettier.base.mjs`.
 - `supabase/` — `migrations/` (SQL, RLS, PostGIS), `functions/` (Edge Functions), `tests/`
   (pgTAP invariant tests), `seed.sql`.
-- `infra/` — added in Phase 5 only if self-hosting is chosen; Docker Compose + backup scripts.
+- `infra/` — added whenever the ResellerClub self-host decision is triggered (see plan's Hosting
+  Strategy), not tied to a fixed phase; Docker Compose + backup scripts.
 - `docs/` — `BACKLOG.md` (phase snapshot), `ARCHITECTURE.md`, `DECISIONS/` (ADRs),
   `RUNBOOKS/weekly-review.md`, `logs/YYYY-MM-DD.md` (daily agent handoff notes).
 
@@ -63,11 +69,11 @@ desktop app). For the day-to-day task-picking procedure and autonomy boundaries,
    never purchase-gated, regardless of which monetization model is eventually chosen. The
    allowlist at `packages/shared-types/src/monetization.ts` (`MONETIZABLE_FEATURES`) is the only
    place that may grant a paywall on anything. It ships empty — adding to it is a human decision
-   made at the Phase 4 gate (see `docs/DECISIONS/ADR-0004-monetization.md` once written), not
+   made at the Phase 5 gate (see `docs/DECISIONS/ADR-0004-monetization.md` once written), not
    something an autonomous run does on its own.
 5. **Lightweight-by-default.** New screens/queries use the client-side cache layer and pagination
    helpers in `packages/api-client` rather than re-fetching full datasets. This keeps hosting
-   costs low regardless of which Phase 5 hosting option (see ADR-0003) is eventually chosen.
+   costs low regardless of which hosting option (see ADR-0003) is eventually chosen.
 6. **Invariant 3 — no plaintext at rest.** No photo is ever persisted server-side in readable
    form. The server may hold plaintext only transiently, in memory, during the upload-time
    moderation scan (bounded to milliseconds, never written to disk or logs) before discarding it
