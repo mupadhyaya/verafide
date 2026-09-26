@@ -83,8 +83,8 @@
         </mxCell>
 
         <!-- External nodes -->
-        <mxCell id="nodeKYC" value="KYC Document-Check Vendor&#10;(e.g. Veriff, ~$0.80/verification)&#10;ID image sent once, no-retention required" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="1160" y="90" width="260" height="70" as="geometry" />
+        <mxCell id="nodeKYC" value="KYC Document-Check Vendor&#10;Didit &#8212; free forever, 500/mo, $0&#10;(Veriff ~$0.80/verif. as paid fallback past 500/mo)&#10;ID image sent once, no-retention required" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="90" width="260" height="80" as="geometry" />
         </mxCell>
         <mxCell id="nodeMod" value="Moderation API&#10;(Sightengine / AWS Rekognition,&#10;~$1-3 per 1,000 images)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
           <mxGeometry x="1160" y="190" width="260" height="65" as="geometry" />

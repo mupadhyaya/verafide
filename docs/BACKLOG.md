@@ -17,7 +17,7 @@ performance, and core UX before real build-out, all on $0 infra.
 |---|---|
 | Monorepo skeleton (pnpm + Turborepo, apps/mobile, apps/web, packages/*, CI wiring) | ✅ Done |
 | Architecture diagram (`docs/diagrams/architecture.drawio`) | ✅ Done |
-| KYC/liveness vendor spike — broadened: (a) on-device SDK (FaceOnLive/FacePlugin), (b) cheap document-check vendor (Veriff) | Not started — see issue #1 |
+| KYC/liveness vendor spike — broadened: (a) on-device SDK (FaceOnLive/FacePlugin), (b) **free** document-check vendor (Didit, 500/mo free forever) | Not started — see issue #1 |
 | PostGIS performance spike (50-100k seed profiles, p50/p95 with RLS on) | Not started — see issue #2 |
 | Content moderation feasibility spike | Not started — see issue #3 |
 | Clickable UX prototype (onboarding → verify(mocked) → profile → swipe → match → chat) | Not started — see issue #4 |
