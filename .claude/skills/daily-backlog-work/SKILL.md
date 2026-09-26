@@ -18,46 +18,50 @@ founder does a weekly review (`docs/RUNBOOKS/weekly-review.md`) to clear anythin
 4. If nothing is ready, say so explicitly in the end-of-day log (step 5) rather than inventing
    work or picking something out of scope for the current phase.
 
-## 2. Branch / PR convention
+## 2. Commit convention
 
-- Branch: `feat|fix|chore/<issue-#>-<slug>`.
-- PR description includes `Closes #<issue>`.
-- PR body states which invariants (if any — see `CLAUDE.md`) were touched, and confirms the
-  relevant tests still pass.
+No PR-required workflow (see `docs/RUNBOOKS/branch-protection.md` — the founder is the sole
+collaborator and doesn't want PR overhead). Commit directly to `main`:
+
+- Conventional Commits style message, referencing the issue (e.g. `Closes #<issue>`).
+- **No `Co-Authored-By` trailer, ever** — the founder explicitly does not want this.
+- State which invariants (if any — see `CLAUDE.md`) were touched, and confirm the relevant tests
+  still pass, in the commit body.
+- Push immediately after committing; watch the `ci.yml` run on that push. If it fails, fix it in
+  an immediate follow-up commit rather than leaving `main` red.
 
 ## 3. Autonomous vs. escalate
 
-Always escalate — open the PR, do **not** self-merge even if CI is green, and leave a comment
-tagging the founder — when the change touches any of:
+Always escalate — **stop and ask the founder directly in conversation before committing**, since
+there's no PR to route review through — when the change touches any of:
 
 - A path matched by `.github/CODEOWNERS` (migrations, verification/moderation Edge Functions,
-  `packages/validation/src/verification/`, `**/billing/**`, `**/payments/**`, `infra/`,
-  `.github/workflows/`, `CLAUDE.md`, `.claude/`, `eas.json`).
+  `packages/validation/src/verification/`, `packages/api-client/src/crypto/`, `**/billing/**`,
+  `**/payments/**`, `infra/`, `.github/workflows/`, `CLAUDE.md`, `.claude/`, `eas.json`).
 - Any RLS policy on `profiles`, `verification_attempts`, `matches`, `messages`, `blocks`, or
   `reports`.
 - The `MONETIZABLE_FEATURES` allowlist in `packages/shared-types/src/monetization.ts`.
-- A new third-party vendor credential or API key.
+- A new third-party vendor credential or API key, or anything with a real dollar cost.
+- Repo/org-level settings (visibility, branch protection, collaborators).
 - Requirements that are ambiguous or under-specified in the linked issue.
 - A migration that drops or renames a column/table containing user data.
 
-Everything else can proceed to a normal PR; PRs outside CODEOWNERS-protected paths may auto-merge
-once required CI checks pass (this is what makes daily autonomy real — see `CLAUDE.md`'s
-branch-protection description). If a PR is queued for human review, move on to the next
-`status:ready-for-agent` issue rather than blocking on it.
+Everything else can proceed straight to a commit on `main`. If something is flagged for the
+founder's input, move on to the next `status:ready-for-agent` issue rather than blocking on it.
 
 ## 4. Guardrail-as-test rule
 
-Before opening a PR, run the invariant test suite (`supabase test db` plus the relevant
-`pnpm test` targets). If a change could plausibly affect the verification-gate or
-never-paywall-core invariant and no test yet covers the specific case touched, **write the test
-first, then the code.** Don't ship an invariant-adjacent change backed only by manual reasoning.
+Before committing, run the invariant test suite (`supabase test db` plus the relevant `pnpm test`
+targets). If a change could plausibly affect the verification-gate or never-paywall-core
+invariant and no test yet covers the specific case touched, **write the test first, then the
+code.** Don't ship an invariant-adjacent change backed only by manual reasoning.
 
 ## 5. End-of-day handoff
 
 Append a short entry to `docs/logs/YYYY-MM-DD.md`:
 
-- Tasks picked up, PRs opened/merged.
-- Anything flagged for human review (and why).
+- Tasks picked up, commits made (with SHAs or a summary).
+- Anything flagged for the founder's input (and why).
 - Blockers discovered.
 - If nothing was ready to work (step 1.4), say so here instead of leaving the day unlogged.
 

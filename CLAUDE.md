@@ -88,9 +88,13 @@ desktop app). For the day-to-day task-picking procedure and autonomy boundaries,
 
 - TypeScript strict mode everywhere (`packages/config/tsconfig.base.json`).
 - zod schemas in `packages/validation` are the single source of truth for validation shapes.
-- Conventional Commits for commit messages.
-- Branch naming: `feat|fix|chore/<issue-#>-<slug>`, PR against `main`, branch deleted on merge.
-- One backlog issue per PR; PR description includes `Closes #<issue>`.
+- Conventional Commits for commit messages. **No `Co-Authored-By` trailer, ever.**
+- **No PR-required workflow.** The founder is the sole collaborator and doesn't want PR overhead
+  (see `docs/RUNBOOKS/branch-protection.md`) — commit directly to `main`. `ci.yml` still runs on
+  every push and must be green; if a push breaks CI, fix it in a follow-up commit right away.
+- For anything CODEOWNERS-protected (see `.github/CODEOWNERS`) or otherwise risky/ambiguous:
+  **pause and ask the founder directly in conversation before committing** — there is no PR to
+  route review through, so this is the actual escalation mechanism now, not a formality.
 
 ## How to run locally
 
@@ -114,7 +118,7 @@ supabase test db  # pgTAP invariant tests, once supabase/tests/ exists
 
 ## Definition of Done
 
-- [ ] Linked issue addressed, PR description includes `Closes #<issue>`
+- [ ] Linked issue addressed; commit message references it (e.g. `Closes #<issue>`)
 - [ ] Tests added/updated for the change
 - [ ] `pnpm lint && pnpm typecheck && pnpm test` green locally
 - [ ] Invariant tests (`rls_verification_gate.sql`, `rls_block_report.sql`,

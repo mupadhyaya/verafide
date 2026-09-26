@@ -1,47 +1,39 @@
 # Branch protection setup for `main`
 
-**Status: not yet applied.** GitHub's branch protection API (required status checks + required
-CODEOWNERS review) requires either a public repo or a GitHub Pro plan on a private repo — this
-repo is private and on the free plan, and neither "make the source public" nor "pay for Pro" is a
-decision to make unilaterally (see the hosting/spend preference in project memory). Enforcement
-today is convention-only: `.github/CODEOWNERS` exists and `.claude/skills/daily-backlog-work/
-SKILL.md`'s escalate matrix references it, but nothing server-side blocks a direct push or an
-unreviewed merge yet. Low risk while solo (only the founder has push access), but revisit before
-adding any other contributor. Re-attempt the command below once the repo goes public or gets Pro.
+**Status: applied (2026-09-26).** The repo is public. The founder explicitly does not want a
+PR-required workflow — no time to manage reviews — so this is deliberately lighter than a typical
+team setup: **direct commits/merges to `main` are allowed, by design.**
 
-Applied once via `gh api` (or GitHub UI → Settings → Branches) after the first push, since the
-branch and its check names need to exist first. Re-apply if the repo is ever recreated.
+**What actually guarantees "no one but the founder can change the code":** the collaborator list,
+not branch protection. GitHub repos — public or private — only grant push access to explicitly
+added collaborators; this repo has exactly one (`mupadhyaya`, admin). Outsiders on a public repo
+can fork and open a PR, but merging that PR still requires someone with write access to click
+merge — nothing here can bypass that. Branch protection settings below are a safety net against
+*accidental* mistakes (a stray force-push or branch deletion), not an access-control mechanism —
+access control is already fully handled by the collaborator list being just one person.
 
-Required settings (matches the GitHub Workflow section of the plan):
-
-- Require a pull request before merging; require branches to be up to date before merging.
-- Required status checks (from `.github/workflows/ci.yml`): `install`, `lint`, `typecheck`,
-  `test`, `db-migrations-check`, `rls-invariant-tests`.
-- Require review from Code Owners (`.github/CODEOWNERS`) — this is what makes the
-  autonomous-vs-escalate matrix in `.claude/skills/daily-backlog-work/SKILL.md` actually
-  enforced rather than a convention someone has to remember.
-- No force pushes, no branch deletion, on `main`.
-
-Applied via:
+Applied settings, deliberately minimal:
 
 ```bash
 gh api repos/mupadhyaya/verafide/branches/main/protection \
   --method PUT \
-  -f required_status_checks[strict]=true \
-  -f 'required_status_checks[contexts][]=install' \
-  -f 'required_status_checks[contexts][]=lint' \
-  -f 'required_status_checks[contexts][]=typecheck' \
-  -f 'required_status_checks[contexts][]=test' \
-  -f 'required_status_checks[contexts][]=db-migrations-check' \
-  -f 'required_status_checks[contexts][]=rls-invariant-tests' \
-  -f enforce_admins=false \
-  -f required_pull_request_reviews[require_code_owner_reviews]=true \
-  -f required_pull_request_reviews[required_approving_review_count]=1 \
-  -f restrictions=null \
-  -f allow_force_pushes=false \
-  -f allow_deletions=false
+  -F "required_status_checks=null" \
+  -F "enforce_admins=false" \
+  -F "required_pull_request_reviews=null" \
+  -F "restrictions=null" \
+  -F "allow_force_pushes=false" \
+  -F "allow_deletions=false" \
+  -F "lock_branch=false"
 ```
 
-`enforce_admins=false` so the founder (repo admin) can still push directly in an emergency;
-tighten to `true` once the daily-agent workflow is proven out and PRs are the only path in
-practice.
+- `required_pull_request_reviews=null` — **no PR required**; direct pushes to `main` are allowed.
+- `required_status_checks=null` — not set, since required status checks are a PR-merge-time gate
+  and are largely inert without a PR requirement. `ci.yml` still runs on every push to `main` and
+  reports pass/fail — visibility without a hard gate.
+- `allow_force_pushes=false`, `allow_deletions=false` — the actual protection this buys: `main`
+  can't be accidentally force-pushed over or deleted, by anyone including the owner via a stray
+  command.
+
+If a PR-required workflow is ever wanted later (e.g. if a second contributor joins), re-apply with
+`required_pull_request_reviews` and `required_status_checks` set — see git history of this file
+for the previous (unapplied, PR-based) version of this config as a reference.
